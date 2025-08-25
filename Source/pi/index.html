@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Character Works Settings</title>
+	<style>
+		body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif; padding: 10px; }
+		label { display: block; margin-top: 8px; font-weight: 600; }
+		input, select, textarea { width: 100%; padding: 6px; margin-top: 4px; box-sizing: border-box; }
+	</style>
+</head>
+<body>
+	<label>Host</label>
+	<input id="host" placeholder="127.0.0.1" />
+
+	<label>Channel</label>
+	<input id="channel" placeholder="1 or CH1" />
+
+	<label>Layer/Field</label>
+	<input id="layer" placeholder="LAYER_NAME or field" />
+
+	<label>Value</label>
+	<input id="value" placeholder="Text value" />
+
+	<label>Motion</label>
+	<input id="motion" placeholder="Motion name" />
+
+	<label>Motion ID</label>
+	<input id="motionId" placeholder="Motion ID" />
+
+	<button id="save">Save</button>
+
+	<script>
+		const sd = {
+			send(action, payload) {
+				const ev = {
+					event: 'sendToPlugin',
+					context: window.$SD?.uuid || '',
+					payload
+				};
+				window.external?.invoke?.(JSON.stringify(ev));
+			}
+		};
+
+		document.getElementById('save').addEventListener('click', () => {
+			const settings = {
+				host: document.getElementById('host').value,
+				channel: document.getElementById('channel').value,
+				layer: document.getElementById('layer').value,
+				value: document.getElementById('value').value,
+				motion: document.getElementById('motion').value,
+				motionId: document.getElementById('motionId').value,
+			};
+			sd.send('sendToPlugin', { settings });
+		});
+	</script>
+</body>
+</html> 

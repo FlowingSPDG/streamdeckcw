@@ -1,0 +1,65 @@
+{
+  "Actions": [
+    {
+      "Name": "Update Field",
+      "States": [
+        {
+          "Image": "images/icon",
+          "TitleAlignment": "middle",
+          "FontSize": "24"
+        }
+      ],
+      "PropertyInspectorPath": "inspector/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Update a CW field",
+      "UUID": "dev.flowingspdg.characterworks.updateField",
+      "Icon": "images/icon"
+    },
+    {
+      "Name": "Take",
+      "States": [
+        {
+          "Image": "images/icon",
+          "TitleAlignment": "middle",
+          "FontSize": "24"
+        }
+      ],
+      "PropertyInspectorPath": "inspector/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Play motion",
+      "UUID": "dev.flowingspdg.characterworks.take",
+      "Icon": "images/icon"
+    },
+    {
+      "Name": "Stop",
+      "States": [
+        {
+          "Image": "images/icon",
+          "TitleAlignment": "middle",
+          "FontSize": "24"
+        }
+      ],
+      "PropertyInspectorPath": "inspector/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Stop motion",
+      "UUID": "dev.flowingspdg.characterworks.stop",
+      "Icon": "images/icon"
+    }
+  ],
+  "SDKVersion": 2,
+  "Author": "FlowingSPDG",
+  "CodePath": "cw_client.exe",
+  "CodePathMac": "cw_client",
+  "Description": "Character Works Controller",
+  "Name": "Character Works [FlowingSPDG]",
+  "Icon": "images/icon",
+  "URL": "https://github.com/FlowingSPDG/streamdeckcw",
+  "Version": "0.1.0",
+  "OS": [
+    { "Platform": "mac", "MinimumVersion": "10.13" },
+    { "Platform": "windows", "MinimumVersion": "10" }
+  ],
+  "Software": { "MinimumVersion": "6.4" },
+  "Category": "Character Works",
+  "CategoryIcon": "images/icon"
+} 

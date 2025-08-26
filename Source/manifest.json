@@ -9,7 +9,7 @@
           "FontSize": "24"
         }
       ],
-      "PropertyInspectorPath": "inspector/pi.html",
+      "PropertyInspectorPath": "inspector/updateField.html",
       "SupportedInMultiActions": true,
       "Tooltip": "Update a CW field",
       "UUID": "dev.flowingspdg.characterworks.updateField",
@@ -24,7 +24,7 @@
           "FontSize": "24"
         }
       ],
-      "PropertyInspectorPath": "inspector/pi.html",
+      "PropertyInspectorPath": "inspector/take.html",
       "SupportedInMultiActions": true,
       "Tooltip": "Play motion",
       "UUID": "dev.flowingspdg.characterworks.take",
@@ -39,7 +39,7 @@
           "FontSize": "24"
         }
       ],
-      "PropertyInspectorPath": "inspector/pi.html",
+      "PropertyInspectorPath": "inspector/stop.html",
       "SupportedInMultiActions": true,
       "Tooltip": "Stop motion",
       "UUID": "dev.flowingspdg.characterworks.stop",
@@ -55,6 +55,7 @@
   "Icon": "images/icon",
   "URL": "https://github.com/FlowingSPDG/streamdeckcw",
   "Version": "0.1.0",
+  "UUID": "dev.flowingspdg.characterworks",
   "OS": [
     { "Platform": "mac", "MinimumVersion": "10.13" },
     { "Platform": "windows", "MinimumVersion": "10" }

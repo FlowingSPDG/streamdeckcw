@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"reflect"
 
 	cw "github.com/FlowingSPDG/cwgo"
 	"github.com/FlowingSPDG/streamdeck"
@@ -56,6 +57,78 @@ func registerAction(client *streamdeck.Client, actionUUID string, state *pluginS
 		return handler(ctx, client, p, state)
 	})
 	streamdeck.OnDidReceivePropertyInspectorMessage(action, func(ctx context.Context, client *streamdeck.Client, msg streamdeck.DidReceivePropertyInspectorMessagePayload[map[string]any]) error {
+		if t, ok := msg.Message["type"].(string); ok && t == "requestInfo" {
+			payload := map[string]any{"type": "info"}
+			var s Settings
+			if raw, ok := msg.Message["settings"].(map[string]any); ok {
+				if v, ok := raw["host"].(string); ok {
+					s.Host = v
+				}
+				if v, ok := raw["channel"].(string); ok {
+					s.Channel = v
+				}
+				if v, ok := raw["layer"].(string); ok {
+					s.Layer = v
+				}
+			}
+			if s.Host != "" {
+				cwcli, _ := getCWClient(state, s.Host)
+				ch := &s.Channel
+				if s.Channel == "" {
+					ch = nil
+				}
+				if actionUUID == "dev.flowingspdg.characterworks.updateField" {
+					if layers := tryListLayers(cwcli, ch); len(layers) > 0 {
+						payload["layers"] = layers
+					}
+				}
+				if actionUUID == "dev.flowingspdg.characterworks.take" || actionUUID == "dev.flowingspdg.characterworks.stop" {
+					motions, ids := tryListMotions(cwcli, ch)
+					if len(motions) > 0 {
+						payload["motions"] = motions
+					}
+					if len(ids) > 0 {
+						payload["motionIds"] = ids
+					}
+				}
+			}
+			return client.SendToPropertyInspector(ctx, payload)
+		}
+		if t, ok := msg.Message["type"].(string); ok && t == "connect" {
+			var s Settings
+			if raw, ok := msg.Message["settings"].(map[string]any); ok {
+				if v, ok := raw["host"].(string); ok {
+					s.Host = v
+				}
+				if v, ok := raw["channel"].(string); ok {
+					s.Channel = v
+				}
+			}
+			if s.Host == "" {
+				return client.SendToPropertyInspector(ctx, map[string]any{"type": "connectResult", "ok": false, "error": "host is required"})
+			}
+			cwcli, _ := getCWClient(state, s.Host)
+			ch := &s.Channel
+			if s.Channel == "" {
+				ch = nil
+			}
+			resp := map[string]any{"type": "connectResult", "ok": true}
+			if actionUUID == "dev.flowingspdg.characterworks.updateField" {
+				if layers := tryListLayers(cwcli, ch); len(layers) > 0 {
+					resp["layers"] = layers
+				}
+			}
+			if actionUUID == "dev.flowingspdg.characterworks.take" || actionUUID == "dev.flowingspdg.characterworks.stop" {
+				motions, ids := tryListMotions(cwcli, ch)
+				if len(motions) > 0 {
+					resp["motions"] = motions
+				}
+				if len(ids) > 0 {
+					resp["motionIds"] = ids
+				}
+			}
+			return client.SendToPropertyInspector(ctx, resp)
+		}
 		if s, ok := msg.Message["settings"]; ok {
 			return client.SetSettings(ctx, s)
 		}
@@ -125,7 +198,79 @@ func getCWClient(state *pluginState, host string) (*cw.CharacterWorks, error) {
 	if host == "" {
 		return nil, nil
 	}
-
 	client, _ := state.clients.LoadOrStore(host, cw.NewCharacterWorks(host, 10))
 	return client, nil
+}
+
+// tryListLayers calls cwgo's ListLayers(*string) if available via reflection
+func tryListLayers(cwcli *cw.CharacterWorks, ch *string) []string {
+	if cwcli == nil {
+		return nil
+	}
+	v := reflect.ValueOf(cwcli)
+	m := v.MethodByName("ListLayers")
+	if !m.IsValid() {
+		return nil
+	}
+	args := []reflect.Value{reflect.ValueOf(ch)}
+	rets := m.Call(args)
+	return pickStringSlice(rets)
+}
+
+// tryListMotions calls cwgo's ListMotions(*string) if available via reflection
+// It supports either ([]string, []string, error) or ([][]string, error) like returns; we coerce best-effort
+func tryListMotions(cwcli *cw.CharacterWorks, ch *string) ([]string, []string) {
+	if cwcli == nil {
+		return nil, nil
+	}
+	v := reflect.ValueOf(cwcli)
+	m := v.MethodByName("ListMotions")
+	if !m.IsValid() {
+		return nil, nil
+	}
+	rets := m.Call([]reflect.Value{reflect.ValueOf(ch)})
+	if len(rets) == 0 {
+		return nil, nil
+	}
+	// Common pattern: motions, ids, err
+	if len(rets) >= 2 {
+		motions := toStringSlice(rets[0])
+		ids := toStringSlice(rets[1])
+		return motions, ids
+	}
+	// Fallback single slice
+	return toStringSlice(rets[0]), nil
+}
+
+func pickStringSlice(rets []reflect.Value) []string {
+	for _, rv := range rets {
+		if s := toStringSlice(rv); len(s) > 0 {
+			return s
+		}
+	}
+	return nil
+}
+
+func toStringSlice(rv reflect.Value) []string {
+	if !rv.IsValid() {
+		return nil
+	}
+	if rv.Kind() == reflect.Interface || rv.Kind() == reflect.Pointer {
+		rv = rv.Elem()
+	}
+	if rv.Kind() != reflect.Slice {
+		return nil
+	}
+	n := rv.Len()
+	res := make([]string, 0, n)
+	for i := 0; i < n; i++ {
+		item := rv.Index(i)
+		if item.Kind() == reflect.Interface || item.Kind() == reflect.Pointer {
+			item = item.Elem()
+		}
+		if item.Kind() == reflect.String {
+			res = append(res, item.String())
+		}
+	}
+	return res
 }

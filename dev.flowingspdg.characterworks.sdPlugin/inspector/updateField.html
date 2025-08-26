@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Update Field Settings</title>
+	<link rel="stylesheet" href="sdpi.css">
+</head>
+<body>
+	<div class="sdpi-wrapper">
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Host</div>
+			<input class="sdpi-item-value" id="host" type="text" value="" placeholder="127.0.0.1" />
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Channel</div>
+			<input class="sdpi-item-value" id="channel" type="text" value="" placeholder="1 or CH1" />
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Layer/Field</div>
+			<input class="sdpi-item-value" id="layer" type="text" value="" placeholder="LAYER_NAME or field" />
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Layers (from CW)</div>
+			<select class="sdpi-item-value" id="layerList"></select>
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Value</div>
+			<input class="sdpi-item-value" id="value" type="text" value="" placeholder="Text value" />
+		</div>
+
+		<div class="sdpi-item">
+			<button class="sdpi-item-value" id="connect">Connect & Fetch</button>
+		</div>
+	</div>
+
+	<script src="sdtools.common.js"></script>
+	<script>
+		const $SD = window.$SD;
+		const PI = window.PI;
+
+		$SD.on('connected', (jsn) => {
+			$SD.getSettings();
+			sendPayloadToPlugin({ type: 'requestInfo', settings: jsn?.actionInfo?.payload?.settings || {} });
+		});
+
+		document.getElementById('connect').addEventListener('click', () => {
+			const settings = collectSettings();
+			sendPayloadToPlugin({ type: 'connect', settings });
+		});
+
+		document.addEventListener('sdpi:message', (e) => {
+			const msg = e.detail;
+			if (msg.event !== 'sendToPropertyInspector') return;
+			const p = msg.payload || {};
+			if (p.type === 'connectResult' && !p.ok) { alert(p.error || 'Failed to connect'); return; }
+			if (p.type === 'info' || p.type === 'connectResult') {
+				if (Array.isArray(p.layers)) fillSelect('layerList', p.layers);
+			}
+		});
+
+		$SD.on('didReceiveSettings', (jsn) => {
+			const settings = jsn.payload.settings;
+			if (settings) {
+				document.getElementById('host').value = settings.host || '';
+				document.getElementById('channel').value = settings.channel || '';
+				document.getElementById('layer').value = settings.layer || '';
+				document.getElementById('value').value = settings.value || '';
+			}
+		});
+
+		['host', 'channel', 'layer', 'value'].forEach(id => {
+			document.getElementById(id).addEventListener('input', () => {
+				$SD.setSettings(collectSettings());
+			});
+		});
+
+		document.getElementById('layerList').addEventListener('change', (e) => {
+			document.getElementById('layer').value = e.target.value || '';
+			$SD.setSettings(collectSettings());
+		});
+
+		function collectSettings() {
+			return {
+				host: document.getElementById('host').value,
+				channel: document.getElementById('channel').value,
+				layer: document.getElementById('layer').value,
+				value: document.getElementById('value').value,
+			};
+		}
+
+		function fillSelect(selectId, items) {
+			const sel = document.getElementById(selectId);
+			sel.innerHTML = '';
+			const placeholder = document.createElement('option');
+			placeholder.value = '';
+			placeholder.text = items.length ? 'Select…' : 'No items';
+			sel.appendChild(placeholder);
+			items.forEach(x => { const o = document.createElement('option'); o.value = x; o.text = x; sel.appendChild(o); });
+		}
+	</script>
+</body>
+</html> 

@@ -61,6 +61,12 @@ function websocketOnMessage(evt) {
     }
     var event = new Event('onmessage',jsonObj.payload);
     document.dispatchEvent(event);
+
+    // New: dispatch full message for consumers
+    try {
+        const ce = new CustomEvent('sdpi:message', { detail: jsonObj });
+        document.dispatchEvent(ce);
+    } catch (e) { console.warn('Failed dispatch sdpi:message', e); }
 }
 
 function getKVElem(k,v) {

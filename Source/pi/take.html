@@ -10,17 +10,17 @@
 	<div class="sdpi-wrapper">
 		<div class="sdpi-item">
 			<div class="sdpi-item-label">Host</div>
-			<input class="sdpi-item-value" id="host" type="text" value="" placeholder="127.0.0.1" />
+			<input class="sdpi-item-value sdProperty" id="host" type="text" value="" placeholder="127.0.0.1" oninput="setSettings()" />
 		</div>
 
 		<div class="sdpi-item">
 			<div class="sdpi-item-label">Channel</div>
-			<input class="sdpi-item-value" id="channel" type="text" value="" placeholder="1 or CH1" />
+			<input class="sdpi-item-value sdProperty" id="channel" type="text" value="" placeholder="1 or CH1" oninput="setSettings()" />
 		</div>
 
 		<div class="sdpi-item">
 			<div class="sdpi-item-label">Motion</div>
-			<input class="sdpi-item-value" id="motion" type="text" value="" placeholder="Motion name" />
+			<input class="sdpi-item-value sdProperty" id="motion" type="text" value="" placeholder="Motion name" oninput="setSettings()" />
 		</div>
 
 		<div class="sdpi-item">
@@ -30,7 +30,7 @@
 
 		<div class="sdpi-item">
 			<div class="sdpi-item-label">Motion ID</div>
-			<input class="sdpi-item-value" id="motionId" type="text" value="" placeholder="Motion ID" />
+			<input class="sdpi-item-value sdProperty" id="motionId" type="text" value="" placeholder="Motion ID" oninput="setSettings()" />
 		</div>
 
 		<div class="sdpi-item">
@@ -45,56 +45,50 @@
 
 	<script src="sdtools.common.js"></script>
 	<script>
-		const $SD = window.$SD;
-		$SD.on('connected', (jsn) => {
-			$SD.getSettings();
-			sendPayloadToPlugin({ type: 'requestInfo', settings: jsn?.actionInfo?.payload?.settings || {} });
+		document.addEventListener('websocketCreate', () => {
+			// Request info when connected with current settings
+			const settings = {
+				host: document.getElementById('host').value,
+				channel: document.getElementById('channel').value,
+				motion: document.getElementById('motion').value,
+				motionId: document.getElementById('motionId').value,
+			};
+			sendPayloadToPlugin({ type: 'requestInfo', settings });
 		});
 
 		document.getElementById('connect').addEventListener('click', () => {
-			sendPayloadToPlugin({ type: 'connect', settings: collectSettings() });
+			// Get current settings from the form
+			const settings = {
+				host: document.getElementById('host').value,
+				channel: document.getElementById('channel').value,
+				motion: document.getElementById('motion').value,
+				motionId: document.getElementById('motionId').value,
+			};
+			sendPayloadToPlugin({ type: 'connect', settings });
 		});
 
 		document.addEventListener('sdpi:message', (e) => {
 			const msg = e.detail;
 			if (msg.event !== 'sendToPropertyInspector') return;
 			const p = msg.payload || {};
-			if (p.type === 'connectResult' && !p.ok) { alert(p.error || 'Failed to connect'); return; }
+			if (p.type === 'connectResult' && !p.ok) { 
+				alert(p.error || 'Failed to connect'); 
+				return; 
+			}
 			if (p.type === 'info' || p.type === 'connectResult') {
 				if (Array.isArray(p.motions)) fillSelect('motionList', p.motions);
 				if (Array.isArray(p.motionIds)) fillSelect('motionIdList', p.motionIds);
 			}
 		});
 
-		$SD.on('didReceiveSettings', (jsn) => {
-			const s = jsn.payload.settings || {};
-			document.getElementById('host').value = s.host || '';
-			document.getElementById('channel').value = s.channel || '';
-			document.getElementById('motion').value = s.motion || '';
-			document.getElementById('motionId').value = s.motionId || '';
-		});
-
-		['host', 'channel', 'motion', 'motionId'].forEach(id => {
-			document.getElementById(id).addEventListener('input', () => { $SD.setSettings(collectSettings()); });
-		});
-
 		document.getElementById('motionList').addEventListener('change', (e) => {
 			document.getElementById('motion').value = e.target.value || '';
-			$SD.setSettings(collectSettings());
+			setSettings();
 		});
 		document.getElementById('motionIdList').addEventListener('change', (e) => {
 			document.getElementById('motionId').value = e.target.value || '';
-			$SD.setSettings(collectSettings());
+			setSettings();
 		});
-
-		function collectSettings() {
-			return {
-				host: document.getElementById('host').value,
-				channel: document.getElementById('channel').value,
-				motion: document.getElementById('motion').value,
-				motionId: document.getElementById('motionId').value,
-			};
-		}
 
 		function fillSelect(selectId, items) {
 			const sel = document.getElementById(selectId);
@@ -103,7 +97,12 @@
 			placeholder.value = '';
 			placeholder.text = items.length ? 'Select…' : 'No items';
 			sel.appendChild(placeholder);
-			items.forEach(x => { const o = document.createElement('option'); o.value = x; o.text = x; sel.appendChild(o); });
+			items.forEach(x => { 
+				const o = document.createElement('option'); 
+				o.value = x; 
+				o.text = x; 
+				sel.appendChild(o); 
+			});
 		}
 	</script>
 </body>

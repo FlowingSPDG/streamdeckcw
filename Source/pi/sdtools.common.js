@@ -1,11 +1,11 @@
-// ****************************************************************
-// * EasyPI v1.3.3
+﻿// ****************************************************************
+// * EasyPI v2.0
 // * Author: BarRaider
 // *
 // * JS library to simplify the communication between the 
 // * Stream Deck's Property Inspector and the plugin.
 // *
-// * Project page: https://github.com/BarRaider/streamdeck-easypi
+// * Project page: https://github.com/BarRaider/streamdeck-easypi-v2
 // * Support: http://discord.barraider.com
 // *
 // * Initially forked from Elgato's common.js file
@@ -59,28 +59,9 @@ function websocketOnMessage(evt) {
         var payload = jsonObj.payload;
         loadConfiguration(payload.settings);
     }
-    var event = new Event('onmessage',jsonObj.payload);
-    document.dispatchEvent(event);
-
-    // New: dispatch full message for consumers
-    try {
-        const ce = new CustomEvent('sdpi:message', { detail: jsonObj });
-        document.dispatchEvent(ce);
-    } catch (e) { console.warn('Failed dispatch sdpi:message', e); }
-}
-
-function getKVElem(k,v) {
-    var parent = document.createElement('div')
-    var key = document.createElement('input');
-    key.value = k
-    key.text = k
-    var value = document.createElement('input');
-    value.value = v
-    value.text = v
-
-    parent.appendChild(key)
-    parent.appendChild(value)
-    return parent
+    else {
+        console.log("Ignored websocketOnMessage: " + jsonObj.event);
+    }
 }
 
 function loadConfiguration(payload) {
@@ -110,21 +91,10 @@ function loadConfiguration(payload) {
                 for (var idx = 0; idx < items.length; idx++) {
                     var opt = document.createElement('option');
                     opt.value = items[idx][valueProperty];
-                    opt.text = `${items[idx][textProperty]}`;
+                    opt.text = items[idx][textProperty];
                     elem.appendChild(opt);
                 }
                 elem.value = payload[valueField];
-            }
-            else if (elem.classList.contains("sdObject")) { // object
-                var obj = payload[key];
-                // Remove all child
-                elem.innerHTML = '';
-
-                // Assign
-                Object.keys(obj).forEach(function (k) {
-                    let parent = getKVElem(k,obj[k])
-                    elem.appendChild(parent);
-                })
             }
             else if (elem.classList.contains("sdHTML")) { // HTML element
                 elem.innerHTML = payload[key];
@@ -148,7 +118,6 @@ function setSettings() {
         var key = elem.id;
         if (elem.classList.contains("sdCheckbox")) { // Checkbox
             payload[key] = elem.checked;
-            console.log("Save: " + key + "<=" + payload[key]);
         }
         else if (elem.classList.contains("sdFile")) { // File
             var elemFile = document.getElementById(elem.id + "Filename");
@@ -161,40 +130,19 @@ function setSettings() {
                 // Set value on initial file selection
                 elemFile.innerText = elem.value;
             }
-            console.log("Save: " + key + "<=" + payload[key]);
-        }
-        else if (elem.classList.contains("sdObject")) { // object
-            // Init object
-            payload[key] = {}
-
-            // Loop child elements
-            var children = elem.children;
-            for (var i = 0; i < children.length; i++) {
-                let child = children[0]
-                let k = child.children[0]
-                let v = child.children[1]
-
-                let objKey = k.value
-                let objVal = v.value
-
-                payload[key][objKey]=objVal
-            }
-            console.log("Save : " + key + "<=" + JSON.stringify(payload[key]));
         }
         else if (elem.classList.contains("sdList")) { // Dynamic dropdown
             var valueField = elem.getAttribute("sdValueField");
             payload[valueField] = elem.value;
-            console.log("Save : " + valueField + "<=" + payload[valueField]);
         }
         else if (elem.classList.contains("sdHTML")) { // HTML element
             var valueField = elem.getAttribute("sdValueField");
             payload[valueField] = elem.innerHTML;
-            console.log("Save: " + valueField + "<=" + payload[valueField]);
         }
         else { // Normal value
             payload[key] = elem.value;
-            console.log("Save: " + key + "<=" + payload[key]);
         }
+        console.log("Save: " + key + "<=" + payload[key]);
     });
     setSettingsToPlugin(payload);
 }

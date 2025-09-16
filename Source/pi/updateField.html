@@ -10,17 +10,17 @@
 	<div class="sdpi-wrapper">
 		<div class="sdpi-item">
 			<div class="sdpi-item-label">Host</div>
-			<input class="sdpi-item-value" id="host" type="text" value="" placeholder="127.0.0.1" />
+			<input class="sdpi-item-value sdProperty" id="host" type="text" value="" placeholder="127.0.0.1" oninput="setSettings()" />
 		</div>
 
 		<div class="sdpi-item">
 			<div class="sdpi-item-label">Channel</div>
-			<input class="sdpi-item-value" id="channel" type="text" value="" placeholder="1 or CH1" />
+			<input class="sdpi-item-value sdProperty" id="channel" type="text" value="" placeholder="1 or CH1" oninput="setSettings()" />
 		</div>
 
 		<div class="sdpi-item">
 			<div class="sdpi-item-label">Layer/Field</div>
-			<input class="sdpi-item-value" id="layer" type="text" value="" placeholder="LAYER_NAME or field" />
+			<input class="sdpi-item-value sdProperty" id="layer" type="text" value="" placeholder="LAYER_NAME or field" oninput="setSettings()" />
 		</div>
 
 		<div class="sdpi-item">
@@ -30,7 +30,7 @@
 
 		<div class="sdpi-item">
 			<div class="sdpi-item-label">Value</div>
-			<input class="sdpi-item-value" id="value" type="text" value="" placeholder="Text value" />
+			<input class="sdpi-item-value sdProperty" id="value" type="text" value="" placeholder="Text value" oninput="setSettings()" />
 		</div>
 
 		<div class="sdpi-item">
@@ -40,16 +40,25 @@
 
 	<script src="sdtools.common.js"></script>
 	<script>
-		const $SD = window.$SD;
-		const PI = window.PI;
-
-		$SD.on('connected', (jsn) => {
-			$SD.getSettings();
-			sendPayloadToPlugin({ type: 'requestInfo', settings: jsn?.actionInfo?.payload?.settings || {} });
+		document.addEventListener('websocketCreate', () => {
+			// Request info when connected with current settings
+			const settings = {
+				host: document.getElementById('host').value,
+				channel: document.getElementById('channel').value,
+				layer: document.getElementById('layer').value,
+				value: document.getElementById('value').value,
+			};
+			sendPayloadToPlugin({ type: 'requestInfo', settings });
 		});
 
 		document.getElementById('connect').addEventListener('click', () => {
-			const settings = collectSettings();
+			// Get current settings from the form
+			const settings = {
+				host: document.getElementById('host').value,
+				channel: document.getElementById('channel').value,
+				layer: document.getElementById('layer').value,
+				value: document.getElementById('value').value,
+			};
 			sendPayloadToPlugin({ type: 'connect', settings });
 		});
 
@@ -57,41 +66,19 @@
 			const msg = e.detail;
 			if (msg.event !== 'sendToPropertyInspector') return;
 			const p = msg.payload || {};
-			if (p.type === 'connectResult' && !p.ok) { alert(p.error || 'Failed to connect'); return; }
+			if (p.type === 'connectResult' && !p.ok) { 
+				alert(p.error || 'Failed to connect'); 
+				return; 
+			}
 			if (p.type === 'info' || p.type === 'connectResult') {
 				if (Array.isArray(p.layers)) fillSelect('layerList', p.layers);
 			}
 		});
 
-		$SD.on('didReceiveSettings', (jsn) => {
-			const settings = jsn.payload.settings;
-			if (settings) {
-				document.getElementById('host').value = settings.host || '';
-				document.getElementById('channel').value = settings.channel || '';
-				document.getElementById('layer').value = settings.layer || '';
-				document.getElementById('value').value = settings.value || '';
-			}
-		});
-
-		['host', 'channel', 'layer', 'value'].forEach(id => {
-			document.getElementById(id).addEventListener('input', () => {
-				$SD.setSettings(collectSettings());
-			});
-		});
-
 		document.getElementById('layerList').addEventListener('change', (e) => {
 			document.getElementById('layer').value = e.target.value || '';
-			$SD.setSettings(collectSettings());
+			setSettings();
 		});
-
-		function collectSettings() {
-			return {
-				host: document.getElementById('host').value,
-				channel: document.getElementById('channel').value,
-				layer: document.getElementById('layer').value,
-				value: document.getElementById('value').value,
-			};
-		}
 
 		function fillSelect(selectId, items) {
 			const sel = document.getElementById(selectId);
@@ -100,7 +87,12 @@
 			placeholder.value = '';
 			placeholder.text = items.length ? 'Select…' : 'No items';
 			sel.appendChild(placeholder);
-			items.forEach(x => { const o = document.createElement('option'); o.value = x; o.text = x; sel.appendChild(o); });
+			items.forEach(x => { 
+				const o = document.createElement('option'); 
+				o.value = x; 
+				o.text = x; 
+				sel.appendChild(o); 
+			});
 		}
 	</script>
 </body>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head lang="en">
+		<title>Set Text</title>
+		<meta charset="utf-8" />
+		<script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+	</head>
+
+	<body>
+		<sdpi-item label="Motion Name">
+			<sdpi-textfield setting="motionName" placeholder="scorebug"></sdpi-textfield>
+		</sdpi-item>
+
+		<sdpi-item label="Text Layer">
+			<sdpi-textfield
+				setting="textLayer"
+				placeholder="CW text layer variable to replace"
+			></sdpi-textfield>
+		</sdpi-item>
+
+		<sdpi-item label="Text Value">
+			<sdpi-textfield setting="textValue" placeholder="Sample Text"></sdpi-textfield>
+		</sdpi-item>
+
+		<sdpi-item label="Channel">
+			<sdpi-select setting="channel">
+				<option value="live1">live1</option>
+				<option value="live2">live2</option>
+				<option value="preview" selected>preview</option>
+			</sdpi-select>
+		</sdpi-item>
+
+		<sdpi-item label="Host">
+			<sdpi-textfield setting="host" placeholder="127.0.0.1"></sdpi-textfield>
+		</sdpi-item>
+
+		<sdpi-item label="Port">
+			<sdpi-number setting="port" min="1" max="65535" value="5201"></sdpi-number>
+		</sdpi-item>
+	</body>
+</html>
+

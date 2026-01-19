@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head lang="en">
+		<title>Activate Grid</title>
+		<meta charset="utf-8" />
+		<script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+	</head>
+
+	<body>
+		<sdpi-item label="Grid Name">
+			<sdpi-textfield setting="gridName" placeholder="Grid 1"></sdpi-textfield>
+		</sdpi-item>
+
+		<sdpi-item label="Grid Cell (row,column)">
+			<sdpi-textfield setting="gridCell" placeholder="0,0"></sdpi-textfield>
+		</sdpi-item>
+
+		<sdpi-item label="Host">
+			<sdpi-textfield setting="host" placeholder="127.0.0.1"></sdpi-textfield>
+		</sdpi-item>
+
+		<sdpi-item label="Port">
+			<sdpi-number setting="port" min="1" max="65535" value="5201"></sdpi-number>
+		</sdpi-item>
+	</body>
+</html>
+

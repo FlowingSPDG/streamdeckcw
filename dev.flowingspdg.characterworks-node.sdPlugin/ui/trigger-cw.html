@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+	<head lang="en">
+		<title>Trigger CharacterWorks</title>
+		<meta charset="utf-8" />
+		<script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+	</head>
+
+	<body>
+		<sdpi-item label="Action">
+			<sdpi-select setting="action">
+				<option value="play_motions">play_motions</option>
+				<option value="stop_motions">stop_motions</option>
+				<option value="finish_motions">finish_motions</option>
+				<option value="pause_motions">pause_motions</option>
+			</sdpi-select>
+		</sdpi-item>
+
+		<sdpi-item label="Motion Name">
+			<sdpi-textfield
+				setting="motionName"
+				placeholder="motion_1, motion_2"
+				info="Separate multiple motions with comma (e.g., motion_1, motion_2)"
+			></sdpi-textfield>
+		</sdpi-item>
+
+		<sdpi-item label="Channel">
+			<sdpi-select setting="channel">
+				<option value="live1">live1</option>
+				<option value="live2">live2</option>
+				<option value="preview" selected>preview</option>
+			</sdpi-select>
+		</sdpi-item>
+
+		<sdpi-item label="Host">
+			<sdpi-textfield setting="host" placeholder="127.0.0.1"></sdpi-textfield>
+		</sdpi-item>
+
+		<sdpi-item label="Port">
+			<sdpi-number setting="port" min="1" max="65535" value="5201"></sdpi-number>
+		</sdpi-item>
+	</body>
+</html>
+

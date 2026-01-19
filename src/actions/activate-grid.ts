@@ -2,7 +2,7 @@ import { action, KeyDownEvent, SingletonAction } from '@elgato/streamdeck'
 import streamDeck from '@elgato/streamdeck'
 import { z } from 'zod'
 
-import { createActivateGridCommand, sendCommand } from '../lib/characterworks'
+import { createActivateGridCommand, sendCommand } from 'characterworks-client'
 
 const ActivateGridSettingsSchema = z.object({
 	gridName: z.string().trim().min(1, 'Grid name is required'),

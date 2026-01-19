@@ -2,7 +2,7 @@ import { action, KeyDownEvent, SendToPluginEvent, SingletonAction } from '@elgat
 import streamDeck from '@elgato/streamdeck'
 import { z } from 'zod'
 
-import { createTriggerCommand, sendCommand, type CharacterWorksChannel, type TriggerAction } from '../lib/characterworks'
+import { createTriggerCommand, sendCommand, type CharacterWorksChannel, type TriggerAction } from 'characterworks-client'
 
 const TriggerActionEnum = z.enum(['play_motions', 'stop_motions', 'finish_motions', 'pause_motions'])
 const ChannelEnum = z.enum(['live1', 'live2', 'preview'])

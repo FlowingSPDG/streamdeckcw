@@ -18,6 +18,7 @@
     },
     "dependencies": {
         "@elgato/streamdeck": "^2.0.0",
+        "characterworks-client": "*",
         "zod": "^3.23.8"
     }
 }

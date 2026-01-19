@@ -2,7 +2,7 @@ import { action, KeyDownEvent, SingletonAction } from '@elgato/streamdeck'
 import streamDeck from '@elgato/streamdeck'
 import { z } from 'zod'
 
-import { createSetTextCommand, sendCommand, type CharacterWorksChannel } from '../lib/characterworks'
+import { createSetTextCommand, sendCommand, type CharacterWorksChannel } from 'characterworks-client'
 
 const ChannelEnum = z.enum(['live1', 'live2', 'preview'])
 

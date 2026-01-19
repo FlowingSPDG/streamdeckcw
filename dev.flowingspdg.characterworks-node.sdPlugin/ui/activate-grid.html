@@ -3,7 +3,8 @@
 	<head lang="en">
 		<title>Activate Grid</title>
 		<meta charset="utf-8" />
-		<script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+		<!-- Use local copy of sdpi-components instead of CDN. -->
+		<script src="./vendor/sdpi-components.js"></script>
 	</head>
 
 	<body>
@@ -20,7 +21,7 @@
 		</sdpi-item>
 
 		<sdpi-item label="Port">
-			<sdpi-number setting="port" min="1" max="65535" value="5201"></sdpi-number>
+			<sdpi-textfield setting="port" placeholder="5201"></sdpi-textfield>
 		</sdpi-item>
 	</body>
 </html>

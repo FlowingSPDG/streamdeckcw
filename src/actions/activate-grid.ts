@@ -1,49 +1,40 @@
 import { action, KeyDownEvent, SingletonAction } from '@elgato/streamdeck'
 import streamDeck from '@elgato/streamdeck'
+import { z } from 'zod'
 
-import { createActivateGridCommand } from '../lib/characterworks/commands'
-import { sendCommand } from '../lib/characterworks/client'
+import { createActivateGridCommand, sendCommand } from '../lib/characterworks'
 
-type ActivateGridSettings = {
-	gridName?: string
-	gridCell?: string // "row,column"
-	host?: string
-	port?: number
-}
+const ActivateGridSettingsSchema = z.object({
+	gridName: z.string().trim().min(1, 'Grid name is required'),
+	gridCell: z
+		.string()
+		.trim()
+		.regex(/^\d+\s*,\s*\d+$/, 'Grid cell must be in the format row,column'),
+	host: z.string().trim().min(1, 'Host is required'),
+	port: z.coerce.number().int().min(1).max(65535),
+})
+
+type ActivateGridSettings = z.infer<typeof ActivateGridSettingsSchema>
 
 @action({ UUID: 'dev.flowingspdg.characterworks-node.activate-grid' })
 export class ActivateGrid extends SingletonAction<ActivateGridSettings> {
 	override async onKeyDown(ev: KeyDownEvent<ActivateGridSettings>): Promise<void> {
-		const { settings } = ev.payload
+		let parsed: ActivateGridSettings
 
-		const gridName = settings.gridName ?? ''
-		const gridCell = settings.gridCell ?? ''
-		const host = settings.host
-		const port = settings.port
-
-		if (!host || !port) {
-			streamDeck.logger.warn('CharacterWorks host/port is not configured')
+		try {
+			parsed = ActivateGridSettingsSchema.parse(ev.payload.settings ?? {})
+		} catch (error) {
+			streamDeck.logger.warn(
+				`activate-grid settings validation failed: ${(error as Error).message}`
+			)
 			return
 		}
 
-		if (!gridName || !gridCell) {
-			streamDeck.logger.warn('Grid name or cell is empty')
-			return
-		}
+		const { gridName, gridCell, host, port } = parsed
 
-		const parts = gridCell.split(',').map((v) => v.trim())
-		if (parts.length !== 2) {
-			streamDeck.logger.warn('Grid cell must be in the format row,column')
-			return
-		}
-
-		const row = Number.parseInt(parts[0], 10)
-		const column = Number.parseInt(parts[1], 10)
-
-		if (Number.isNaN(row) || Number.isNaN(column)) {
-			streamDeck.logger.warn('Grid cell coordinates must be numbers')
-			return
-		}
+		const [rowStr, columnStr] = gridCell.split(',').map((v) => v.trim())
+		const row = Number.parseInt(rowStr, 10)
+		const column = Number.parseInt(columnStr, 10)
 
 		try {
 			const command = createActivateGridCommand(gridName, row, column)

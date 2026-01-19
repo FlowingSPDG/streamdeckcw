@@ -3,7 +3,8 @@
 	<head lang="en">
 		<title>Trigger CharacterWorks</title>
 		<meta charset="utf-8" />
-		<script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+		<!-- Use local copy of sdpi-components instead of CDN. -->
+		<script src="./vendor/sdpi-components.js"></script>
 	</head>
 
 	<body>
@@ -17,11 +18,12 @@
 		</sdpi-item>
 
 		<sdpi-item label="Motion Name">
-			<sdpi-textfield
+			<sdpi-select
 				setting="motionName"
-				placeholder="motion_1, motion_2"
-				info="Separate multiple motions with comma (e.g., motion_1, motion_2)"
-			></sdpi-textfield>
+				datasource="getCharacterWorksMotions"
+				loading="Fetching motions from CharacterWorks..."
+				hot-reload
+			></sdpi-select>
 		</sdpi-item>
 
 		<sdpi-item label="Channel">
@@ -37,7 +39,7 @@
 		</sdpi-item>
 
 		<sdpi-item label="Port">
-			<sdpi-number setting="port" min="1" max="65535" value="5201"></sdpi-number>
+			<sdpi-textfield setting="port" placeholder="5201"></sdpi-textfield>
 		</sdpi-item>
 	</body>
 </html>

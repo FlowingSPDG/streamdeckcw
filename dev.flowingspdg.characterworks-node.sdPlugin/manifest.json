@@ -1,0 +1,79 @@
+{
+	"Name": "Character Works | NodeJS",
+	"Version": "0.1.0.0",
+	"Author": "FlowingSPDG",
+	"Actions": [
+		{
+			"Name": "Trigger CharacterWorks",
+			"UUID": "dev.flowingspdg.characterworks-node.trigger-cw",
+			"Icon": "imgs/actions/counter/icon",
+			"Tooltip": "Trigger CharacterWorks motions.",
+			"PropertyInspectorPath": "ui/trigger-cw.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/counter/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		},
+		{
+			"Name": "Set Text",
+			"UUID": "dev.flowingspdg.characterworks-node.set-text",
+			"Icon": "imgs/actions/counter/icon",
+			"Tooltip": "Set text for a CharacterWorks motion.",
+			"PropertyInspectorPath": "ui/set-text.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/counter/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		},
+		{
+			"Name": "Activate Grid",
+			"UUID": "dev.flowingspdg.characterworks-node.activate-grid",
+			"Icon": "imgs/actions/counter/icon",
+			"Tooltip": "Activate a grid cell in CharacterWorks.",
+			"PropertyInspectorPath": "ui/activate-grid.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/counter/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		}
+	],
+	"Category": "Character Works | NodeJS",
+	"CategoryIcon": "imgs/plugin/category-icon",
+	"CodePath": "bin/plugin.js",
+	"Description": "Character Works plugin for StreamDeck NodeJS",
+	"Icon": "imgs/plugin/marketplace",
+	"SDKVersion": 3,
+	"Software": {
+		"MinimumVersion": "6.9"
+	},
+	"OS": [
+		{
+			"Platform": "mac",
+			"MinimumVersion": "12"
+		},
+		{
+			"Platform": "windows",
+			"MinimumVersion": "10"
+		}
+	],
+	"Nodejs": {
+		"Version": "20",
+		"Debug": "enabled"
+	},
+	"UUID": "dev.flowingspdg.characterworks-node"
+}
